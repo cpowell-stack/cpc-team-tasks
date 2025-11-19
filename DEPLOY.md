@@ -33,6 +33,10 @@ To run the application locally in production mode:
         - `EMAIL_SERVER_PASSWORD`: Your SMTP password.
 4.  **Deploy:** Click "Deploy".
 
+### Troubleshooting Vercel Deployments
+- **Prisma Client Error:** If you see an error about outdated Prisma Client, ensure your `package.json` has `"postinstall": "prisma generate"`. This runs the generator after dependencies are installed.
+- **Database Connection:** Ensure your `DATABASE_URL` points to a reachable PostgreSQL or MySQL database. SQLite files do not persist on Vercel.
+
 ## Docker Deployment
 
 1.  **Build the Docker image:**
