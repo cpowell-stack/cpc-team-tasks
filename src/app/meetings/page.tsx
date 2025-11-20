@@ -10,18 +10,19 @@ import { MeetingFilter } from "@/components/MeetingFilter";
 
 export const dynamic = 'force-dynamic';
 
-interface MeetingsPageProps {
-    searchParams: { filter?: string };
-}
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
-export default async function MeetingsPage({ searchParams }: MeetingsPageProps) {
+export default async function MeetingsPage(props: {
+    searchParams: SearchParams
+}) {
+    const searchParams = await props.searchParams
     const session = await getServerSession(authOptions);
 
     if (!session) {
         redirect("/login");
     }
 
-    const filter = searchParams?.filter || "upcoming";
+    const filter = (typeof searchParams.filter === 'string' ? searchParams.filter : "upcoming");
     const now = new Date();
     let dateFilter: any = {};
 
