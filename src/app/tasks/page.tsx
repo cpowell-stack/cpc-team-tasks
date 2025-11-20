@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 export const dynamic = 'force-dynamic';
 
 
+
 export default async function TasksPage() {
     const session = await getServerSession(authOptions);
 
