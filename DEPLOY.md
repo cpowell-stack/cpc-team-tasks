@@ -31,6 +31,8 @@ To run the application locally in production mode:
         - `GOOGLE_CLIENT_SECRET`: From Google Cloud Console.
         - `EMAIL_SERVER_USER`: Your SMTP user.
         - `EMAIL_SERVER_PASSWORD`: Your SMTP password.
+        - `GOOGLE_SERVICE_ACCOUNT_EMAIL`: Email of your Google Service Account.
+        - `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`: Private key of your Google Service Account.
 4.  **Deploy:** Click "Deploy".
 
 ### Troubleshooting Vercel Deployments
