@@ -9,11 +9,32 @@ const SHEET_IDS = {
 };
 
 export class GoogleSheetsService {
-    private auth;
-    private sheets;
+    private auth: any = null;
+    private sheets: any = null;
 
-    constructor() {
-        const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    private getClient() {
+        if (this.sheets) return this.sheets;
+
+        let privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+
+        if (!privateKey) {
+            console.error("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY is missing");
+            throw new Error("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY is missing");
+        }
+
+        // Handle potential surrounding quotes from env vars
+        if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+            privateKey = privateKey.slice(1, -1);
+        }
+
+        // Handle escaped newlines
+        privateKey = privateKey.replace(/\\n/g, '\n');
+
+        // Basic validation to catch common copy-paste errors that cause ERR_OSSL_UNSUPPORTED
+        if (!privateKey.includes("-----BEGIN PRIVATE KEY-----")) {
+            console.error("GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY appears invalid (missing header)");
+            // We won't throw here just in case, but it's suspicious.
+        }
 
         this.auth = new google.auth.GoogleAuth({
             credentials: {
@@ -24,11 +45,13 @@ export class GoogleSheetsService {
         });
 
         this.sheets = google.sheets({ version: 'v4', auth: this.auth });
+        return this.sheets;
     }
 
     async getRows(sheetId: string, range: string = 'A:Z') {
         try {
-            const response = await this.sheets.spreadsheets.values.get({
+            const sheets = this.getClient();
+            const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: sheetId,
                 range,
             });
@@ -41,7 +64,8 @@ export class GoogleSheetsService {
 
     async appendRow(sheetId: string, values: any[]) {
         try {
-            const response = await this.sheets.spreadsheets.values.append({
+            const sheets = this.getClient();
+            const response = await sheets.spreadsheets.values.append({
                 spreadsheetId: sheetId,
                 range: 'A1',
                 valueInputOption: 'USER_ENTERED',
@@ -58,7 +82,8 @@ export class GoogleSheetsService {
 
     async updateRow(sheetId: string, range: string, values: any[]) {
         try {
-            const response = await this.sheets.spreadsheets.values.update({
+            const sheets = this.getClient();
+            const response = await sheets.spreadsheets.values.update({
                 spreadsheetId: sheetId,
                 range,
                 valueInputOption: 'USER_ENTERED',
