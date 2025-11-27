@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { taskRepository } from "@/lib/repositories/TaskRepository";
 import { format } from "date-fns";
 
 export default async function DashboardPage() {
@@ -11,36 +11,17 @@ export default async function DashboardPage() {
         redirect("/login");
     }
 
-    const tasks = await prisma.task.findMany({
-        where: {
-            assigneeId: session.user.id,
-            status: {
-                not: "DONE",
-            },
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-        take: 5,
-        include: {
-            meeting: true,
-        },
-    });
+    const allTasks = await taskRepository.getTasks();
+    const tasks = allTasks
+        .filter(t => t.assigneeId === session.user.id && t.status !== "DONE")
+        .sort((a, b) => (b.id > a.id ? 1 : -1)) // Approximate sort by creation (using ID or we need createdAt)
+        .slice(0, 5);
 
-    const meetings = await prisma.meeting.findMany({
-        where: {
-            date: {
-                gte: new Date(),
-            },
-        },
-        orderBy: {
-            date: "asc",
-        },
-        take: 5,
-        include: {
-            organizer: true,
-        },
-    });
+    // We need to map meeting to null as it's not supported
+    const tasksWithMeeting = tasks.map(t => ({ ...t, meeting: null }));
+
+    // Meetings not supported yet
+    const meetings: any[] = [];
 
     return (
         <div className="space-y-6">
@@ -54,7 +35,7 @@ export default async function DashboardPage() {
                         <p className="text-gray-500">No pending tasks.</p>
                     ) : (
                         <ul className="divide-y divide-gray-200">
-                            {tasks.map((task: any) => (
+                            {tasksWithMeeting.map((task: any) => (
                                 <li key={task.id} className="py-4">
                                     <div className="flex justify-between">
                                         <div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "@prisma/client";
+import { User } from "@/lib/repositories/UserRepository";
 
 interface TaskFormProps {
     users: User[];

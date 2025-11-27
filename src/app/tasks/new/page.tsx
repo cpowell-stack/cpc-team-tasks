@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { userRepository } from "@/lib/repositories/UserRepository";
 import { TaskForm } from "@/components/TaskForm";
 
 export default async function NewTaskPage() {
@@ -11,11 +11,9 @@ export default async function NewTaskPage() {
         redirect("/login");
     }
 
-    const users = await prisma.user.findMany({
-        orderBy: {
-            name: "asc",
-        },
-    });
+    const users = await userRepository.getAllUsers();
+    // Sort by name
+    users.sort((a, b) => a.name.localeCompare(b.name));
 
     return (
         <div className="max-w-2xl mx-auto">
