@@ -11,7 +11,7 @@ export class TeamRepository {
     async getAllTeams(): Promise<Team[]> {
         const rows = await googleSheetsService.getRows(this.sheetId);
         const headers = rows[0];
-        return rows.slice(1).map(row => this.mapRowToTeam(row, headers));
+        return rows.slice(1).map((row: any[]) => this.mapRowToTeam(row, headers));
     }
 
     async updateTeam(id: string, data: Partial<Team>): Promise<void> {
@@ -20,7 +20,7 @@ export class TeamRepository {
         const idIndex = headers.indexOf('Row ID');
         if (idIndex === -1) throw new Error('Row ID column not found');
 
-        const rowIndex = rows.findIndex(row => row[idIndex] === id);
+        const rowIndex = rows.findIndex((row: any[]) => row[idIndex] === id);
         if (rowIndex === -1) throw new Error(`Team with ID ${id} not found`);
 
         const sheetRowNumber = rowIndex + 1;

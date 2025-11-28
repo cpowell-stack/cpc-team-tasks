@@ -18,7 +18,7 @@ export class TaskRepository {
     async getTasks(): Promise<Task[]> {
         const rows = await googleSheetsService.getRows(this.sheetId);
         const headers = rows[0];
-        return rows.slice(1).map(row => this.mapRowToTask(row, headers));
+        return rows.slice(1).map((row: any[]) => this.mapRowToTask(row, headers));
     }
 
     async createTask(task: Omit<Task, 'id'>): Promise<Task> {
@@ -26,7 +26,7 @@ export class TaskRepository {
         const rows = await googleSheetsService.getRows(this.sheetId, 'A1:Z1');
         const headers = rows[0];
 
-        const rowData = headers.map(header => {
+        const rowData = headers.map((header: string) => {
             switch (header) {
                 case 'Row ID': return newTask.id;
                 case 'What': return newTask.title;
@@ -50,7 +50,7 @@ export class TaskRepository {
         const idIndex = headers.indexOf('Row ID');
         if (idIndex === -1) throw new Error('Row ID column not found');
 
-        const rowIndex = rows.findIndex(row => row[idIndex] === id);
+        const rowIndex = rows.findIndex((row: any[]) => row[idIndex] === id);
         if (rowIndex === -1) throw new Error(`Task with ID ${id} not found`);
 
         // Google Sheets is 1-indexed, and we need to account for the header row if we were using A1 notation for the whole sheet

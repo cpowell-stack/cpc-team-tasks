@@ -19,7 +19,7 @@ export class UserRepository {
 
         if (emailIndex === -1) return null;
 
-        const userRow = rows.find(row => row[emailIndex] === email);
+        const userRow = rows.find((row: any[]) => row[emailIndex] === email);
 
         if (!userRow) return null;
 
@@ -29,7 +29,7 @@ export class UserRepository {
     async getAllUsers(): Promise<User[]> {
         const rows = await googleSheetsService.getRows(this.sheetId);
         const headers = rows[0];
-        return rows.slice(1).map(row => this.mapRowToUser(row, headers));
+        return rows.slice(1).map((row: any[]) => this.mapRowToUser(row, headers));
     }
 
     async updateUser(id: string, data: Partial<User>): Promise<void> {
@@ -38,7 +38,7 @@ export class UserRepository {
         const idIndex = headers.indexOf('Row ID');
         if (idIndex === -1) throw new Error('Row ID column not found');
 
-        const rowIndex = rows.findIndex(row => row[idIndex] === id);
+        const rowIndex = rows.findIndex((row: any[]) => row[idIndex] === id);
         if (rowIndex === -1) throw new Error(`User with ID ${id} not found`);
 
         const sheetRowNumber = rowIndex + 1;
